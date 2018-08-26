@@ -35,7 +35,7 @@ size_t idxDelta = idxEpsi + N;
 size_t idxA = idxDelta + N - 1;
 
 // The reference velocity in mph
-double ref_v = 85;
+double ref_v = 100;
 
 class FG_eval {
  public:
@@ -54,22 +54,22 @@ class FG_eval {
 
     // Errors and relative velocity
     for (uint t = 0; t < N; t++) {
-      fg[0] += 6*CppAD::pow(vars[idxCTE + t], 2);
-      fg[0] += 5*CppAD::pow(vars[idxEpsi + t], 2);
+      fg[0] += 800*CppAD::pow(vars[idxCTE + t], 2);
+      fg[0] += 800*CppAD::pow(vars[idxEpsi + t], 2);
       fg[0] += 1*CppAD::pow(vars[idxV + t] - ref_v, 2);
     }
 
     // Avoid changing acceleration and steering angle too much
     for (uint t = 0; t < N - 1; t++) {
-      fg[0] += 35*CppAD::pow(vars[idxDelta + t] * vars[idxV+t], 2);
-      fg[0] += 1*CppAD::pow(vars[idxDelta + t], 2);
-      fg[0] += 5*CppAD::pow(vars[idxA + t], 2);
+      fg[0] += 450*CppAD::pow(vars[idxDelta + t] * vars[idxV+t], 2);
+      fg[0] += 20*CppAD::pow(vars[idxDelta + t], 2);
+      fg[0] += 1*CppAD::pow(vars[idxA + t], 2);
     }
 
     // Prefer changes in acceleration and steering that are close to the previous
     for (uint t = 0; t < N - 2; t++) {
-      fg[0] += 15*CppAD::pow(vars[idxDelta + t + 1] - vars[idxDelta + t], 2);
-      fg[0] += 10*CppAD::pow(vars[idxA + t + 1] - vars[idxA + t], 2);
+      fg[0] += 1*CppAD::pow(vars[idxDelta + t + 1] - vars[idxDelta + t], 2);
+      fg[0] += 1*CppAD::pow(vars[idxA + t + 1] - vars[idxA + t], 2);
     }
 
     // Model Equations:
@@ -96,8 +96,14 @@ class FG_eval {
       AD<double> v0 = vars[idxV + t - 1];
       AD<double> cte0 = vars[idxCTE + t - 1];
       AD<double> epsi0 = vars[idxEpsi + t - 1];
+
       AD<double> delta0 = vars[idxDelta + t - 1];
       AD<double> a0 = vars[idxA + t - 1];
+      // because of 100ms of latency use previous timestep
+      if (t > 1) {
+        delta0 = vars[idxDelta + t - 2];
+        a0 = vars[idxA + t - 2];
+      }
 
       // Adding more coeffs dramatically improved performance
       //AD<double> f0 = coeffs[0] + coeffs[1] * x0;
