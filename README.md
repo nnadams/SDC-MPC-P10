@@ -23,7 +23,7 @@ Before the given waypoints are fit to a polynomial, they are converted to the ve
 
 ***Model Predictive Control with Latency***
 
-Part of this project was to inject 100ms of latency into the system. Tuning the cost function was how I solved that issue. I heavily favored small changes in speed and acceleration, especially at high speeds. This helps prevent the car from taking turn too wildly, and even works well at high speeds, as shown in the video.
+Part of this project was to inject 100ms of latency into the system. I have altered the MPC calculation to use the previous the actuation values. The tuning of the cost function is another way I helped the issue. I heavily favored small changes in speed and acceleration, especially at high speeds. This helps prevent the car from taking turn too wildly, and even works well at high speeds, as shown in the video.
 
 ## Dependencies
 
